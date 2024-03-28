@@ -1,0 +1,70 @@
+
+SELECT 	a.STORE_LOCATION, 
+		IFNULL(am.AM, 'Other') AreaManager, 
+		a.SALES_NUMBER,
+		a.SALES_DATE, 
+		a.SALES_TIME, 
+		a.CLIENT_ID, 
+		a.CLIENT_NAME,
+		ttc.PHONE, 
+		ttc.GENDER, 
+		CASE WHEN a.MEMBER_TYPE = 'member'
+				 AND MONTH(a.CLIENT_CREATION_DATE) = MONTH(a.SALES_DATE) 
+				 AND YEAR(a.CLIENT_CREATION_DATE) = YEAR(a.SALES_DATE)
+				 AND a.CLIENT_STORE_REGISTRATION = a.STORE_LOCATION 
+			 THEN 'New Member'
+			 WHEN a.MEMBER_TYPE = 'Other' THEN 'Other'
+			 WHEN a.MEMBER_TYPE = 'Non Member' THEN 'Non Member'
+		ELSE 'Existing'
+		END AS MemberClassification,
+		a.ITEM_CODE, a.ITEM_NAME, 
+		IFNULL(gc1.GCAT1, 'Unknown') GroupCategory1,
+		a.ITEM_DIVISION, 
+		a.ITEM_GROUP, 
+		a.ITEM_MODEL, 
+		-- a.NON_FUNCTIONAL_25, 
+		-- a.CHANNEL_TYPE, 
+		-- a.PROMOTION_TYPE,
+		-- a.APPLIED_PROMO, 
+		SUM(a.PARENT_QTY) PARENT_QTY, 
+		SUM(a.TOTAL_PRICE_AFTER_TAX) SALES_VALUE
+		-- SUM(a.REBATE) REBATE, SUM(a.TOTAL_GROSS_MARGIN_ACCURATE) TOTAL_GROSS_MARGIN_ACCURATE
+FROM tr_tbl_sales_by_item a
+LEFT JOIN tr_tbl_customer ttc ON ttc.CODE = a.CLIENT_ID 
+LEFT JOIN ip_store_am am ON am.StoreLocation = a.STORE_LOCATION 
+LEFT JOIN ip_gcat1 gc1 ON gc1.PIC_CM = a.PIC_CM
+WHERE a.SALES_DATE BETWEEN '20240101' AND '20240131'
+AND a.Store_location not like '%Erajaya Plaza'
+AND a.SALES_STATUS not like 'CANCEL%'
+-- AND a.ITEM_CODE = '8100113904'
+GROUP BY a.STORE_LOCATION,
+		IFNULL(am.AM, 'Other'),
+		a.SALES_NUMBER,
+		a.SALES_DATE, 
+		a.SALES_TIME, 
+		a.CLIENT_ID, 
+		a.CLIENT_NAME,
+		ttc.PHONE, 
+		ttc.GENDER, 
+		CASE WHEN a.MEMBER_TYPE = 'member'
+				 AND MONTH(a.CLIENT_CREATION_DATE) = MONTH(a.SALES_DATE) 
+				 AND YEAR(a.CLIENT_CREATION_DATE) = YEAR(a.SALES_DATE)
+				 AND a.CLIENT_STORE_REGISTRATION = a.STORE_LOCATION 
+			 THEN 'New Member'
+			 WHEN a.MEMBER_TYPE = 'Other' THEN 'Other'
+			 WHEN a.MEMBER_TYPE = 'Non Member' THEN 'Non Member'
+		ELSE 'Existing' END,
+		a.ITEM_CODE, 
+		a.ITEM_NAME, 
+		IFNULL(gc1.GCAT1, 'Unknown'),
+		a.ITEM_DIVISION , 
+		a.ITEM_GROUP, 
+		a.ITEM_MODEL
+		-- a.NON_FUNCTIONAL_25, 
+		-- a.CHANNEL_TYPE, 
+		-- a.PROMOTION_TYPE, 
+		-- a.APPLIED_PROMO
+
+		
+select * from tr_tbl_sales_by_item	limit 100	
+		
