@@ -18,10 +18,29 @@ def rgbtohex(rgb):
   iValue = int(strValue,16)
   return iValue
 
+def conformat(rng):
+  ws.Range(rng).FormatConditions.AddColorScale(ColorScaleType=3)
+  ws.Range(rng).FormatConditions(ws.Range(rng).FormatConditions.Count).SetFirstPriority()
+  [c1,c2,c3] = [ws.Range(rng).FormatConditions(1).ColorScaleCriteria(n) for n in range(1, 4)]
+  c1.Type = c.xlConditionValueLowestValue
+  c1.FormatColor.Color = 7039480
+  c1.FormatColor.TintAndShade = 0
+  c2.Type = c.xlConditionValuePercentile
+  c2.Value = 50
+  c2.FormatColor.Color = 8711167
+  c2.FormatColor.TintAndShade = 0
+  c3.Type = c.xlConditionValueHighestValue
+  c3.FormatColor.Color = 8109667
+  c3.FormatColor.TintAndShade = 0
+
+
 #=============== CREATE EXCEL REPORT ==================
+asofdate = str(sys.argv[1])
+dt_aod = datetime.strptime(asofdate, '%Y%m%d')
+
 # VARIABLES
 workdir = "D:\\ISMAIL_ERABW\\reports"
-dt_file = "March 2024 - Wellings Daily Sales & Target - DDMMYYYY"
+dt_file = "March 2024 - Wellings Daily Sales & Target - " + datetime.strftime(dt_aod, '%Y%m%d')
 
 # xl = mycom.Dispatch('Excel.Application')
 xl = mycom.gencache.EnsureDispatch('Excel.Application')
@@ -47,7 +66,7 @@ for index, row in liststore.iterrows():
     xl.ActiveWindow.Zoom = 70
     xl.DisplayAlerts = False
     
-    q = "CALL SP_RPT_DailySalesMTD(1, null, '" + row['STORE_CODE'] + "')"
+    q = "CALL SP_RPT_DailySalesMTD(1, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
     dfw = pd.read_sql(q, cn)
     dfw = dfw.fillna('')
     
@@ -103,7 +122,6 @@ for index, row in liststore.iterrows():
     ws.Range("G:H").NumberFormat = "0.0%"
     ws.Range("K:K").NumberFormat = "0.0%"
     ws.Range("N:N").NumberFormat = "0.0%"
-    
     # Title Font
     ws.Range(ws.Cells(1,2), ws.Cells(1,2)).Font.FontStyle = "Bold"
 
@@ -209,7 +227,7 @@ for index, row in liststore.iterrows():
 
 # #  =============== HALODOC  =======================================================================
 
-#     q = "CALL SP_RPT_DailySalesMTD(2, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(2, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -345,7 +363,7 @@ for index, row in liststore.iterrows():
 
 # #  =============== CEK KES  =======================================================================
 
-#     q = "CALL SP_RPT_DailySalesMTD(3, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(3, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -488,7 +506,7 @@ for index, row in liststore.iterrows():
 
 # #  =============== PWP  =======================================================================
 
-#     q = "CALL SP_RPT_DailySalesMTD(4, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(4, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -628,7 +646,7 @@ for index, row in liststore.iterrows():
 
 # #  =============== THematic =======================================================================
 
-#     q = "CALL SP_RPT_DailySalesMTD(5, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(5, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -768,7 +786,7 @@ for index, row in liststore.iterrows():
 
 #     #  =============== Best Choice =======================================================================
 
-#     q = "CALL SP_RPT_DailySalesMTD(6, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(6, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -908,7 +926,7 @@ for index, row in liststore.iterrows():
 
 # #  =============== Pharma =======================================================================
 
-#     q = "CALL SP_RPT_DailySalesMTD(7, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(7, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -1046,7 +1064,7 @@ for index, row in liststore.iterrows():
 #        ws.Range(ws.Cells(li,st_col+4), ws.Cells(li,st_col+4)).Formula = "=BH" + str(li-1) + "+BG" + str(li) +""    
 
 # #  =============== No Of Existing Member =======================================================================
-#     q = "CALL SP_RPT_DailySalesMTD(8, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(8, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -1174,7 +1192,7 @@ for index, row in liststore.iterrows():
 #        ws.Range(ws.Cells(li,st_col+4), ws.Cells(li,st_col+4)).Formula = "=F" + str(li-1) + "+E" + str(li) +""    
 
 # #  =============== TRX Existing Member =======================================================================
-#     q = "CALL SP_RPT_DailySalesMTD(9, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(9, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -1302,7 +1320,7 @@ for index, row in liststore.iterrows():
 #        ws.Range(ws.Cells(li,st_col+4), ws.Cells(li,st_col+4)).Formula = "=N" + str(li-1) + "+M" + str(li) +""    
 
 # #  =============== No Of New Member =======================================================================
-#     q = "CALL SP_RPT_DailySalesMTD(10, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(10, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -1430,7 +1448,7 @@ for index, row in liststore.iterrows():
 #        ws.Range(ws.Cells(li,st_col+4), ws.Cells(li,st_col+4)).Formula = "=V" + str(li-1) + "+U" + str(li) +""    
 
 # #  =============== trx Of New+Non Member =======================================================================
-#     q = "CALL SP_RPT_DailySalesMTD(11, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(11, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -1558,7 +1576,7 @@ for index, row in liststore.iterrows():
 #        ws.Range(ws.Cells(li,st_col+4), ws.Cells(li,st_col+4)).Formula = "=AD" + str(li-1) + "+AC" + str(li) +""    
     
 #  =============== TOP 30 SKU =======================================================================
-    q = "CALL SP_RPT_DailySalesMTD(12, null, '" + row['STORE_CODE'] + "')"
+    q = "CALL SP_RPT_DailySalesMTD(12, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
     dfw = pd.read_sql(q, cn)
     dfw = dfw.fillna('')
     
@@ -1648,7 +1666,7 @@ for index, row in liststore.iterrows():
     ws.Range(ws.Cells(st_row-2,st_col), ws.Cells(st_row+rmax-5,st_col+cmax)).Borders(c.xlEdgeRight).Color = 0
 
 # #  =============== CEK KES by Store by Person =======================================================================
-#     q = "CALL SP_RPT_DailySalesMTD(13, null, '" + row['STORE_CODE'] + "')"
+#     q = "CALL SP_RPT_DailySalesMTD(13, '" + asofdate + "', '" + row['STORE_CODE'] + "')"
 #     dfw = pd.read_sql(q, cn)
 #     dfw = dfw.fillna('')
     
@@ -1810,8 +1828,10 @@ xl.ActiveWindow.Zoom = 90
 xl.DisplayAlerts = False
 
 ws.Range("B1").Value = "SUMMARY MTD"  
+ws.Range("B1").Font.Size = 20  
+ws.Range("B1").Font.FontStyle = "Bold"
 
-q = "CALL SP_RPT_DailySalesMTD(14, null, null)"
+q = "CALL SP_RPT_DailySalesMTD(16, '" + asofdate + "', null)"
 dfw = pd.read_sql(q, cn)
 dfw = dfw.fillna('')
     
@@ -1820,18 +1840,30 @@ rmax = len(dfw.index) + 4
 
 # Paste recordset
 st_row = 6
-st_col = 1
+st_col = 2
 ws.Range(ws.Cells(st_row, st_col),# Cell to start the "paste"
           ws.Cells(st_row + len(dfw.index) - 1,
                   st_col + len(dfw.columns) - 1) # No -1 for the index
           ).Value = dfw.to_records(index=False)
 
+q = "CALL SP_RPT_DailySalesMTD(17, '" + asofdate + "', null)"
+dfw = pd.read_sql(q, cn)
+dfw = dfw.fillna('')
+    
+cmax = len(dfw.columns)
+rmax = len(dfw.index) + 4
+
+# Paste recordset
 st_row = 27
-st_col = 1
+st_col = 2
 ws.Range(ws.Cells(st_row, st_col),# Cell to start the "paste"
           ws.Cells(st_row + len(dfw.index) - 1,
                   st_col + len(dfw.columns) - 1) # No -1 for the index
           ).Value = dfw.to_records(index=False)
+
+ws.Range("I22:J22").Copy()
+ws.Range("I5:J5").PasteSpecial(Paste=c.xlPasteValues) 
+ws.Range("C22:J22").ClearContents()
 
 # table border 1
 ws.Range("B3:AC5").Borders(c.xlInsideHorizontal).LineStyle = c.xlContinuous
@@ -2164,7 +2196,222 @@ ws.Range("L24:N42").Borders(c.xlEdgeRight).Color = 0
 ws.Columns("B:B").ColumnWidth = 40
 ws.Columns("C:AC").ColumnWidth = 14
 
-# finalize workbook
+# conditional format
+conformat("E5:E21")
+conformat("H5:H21")
+conformat("K5:K21")
+conformat("N5:N21")
+conformat("Q5:Q21")
+conformat("T5:T21")
+conformat("W5:W21")
+conformat("Z5:Z21")
+conformat("AC5:AC21")
+
+conformat("E26:E42")
+conformat("H26:H42")
+conformat("K26:K42")
+conformat("N26:N42")
+
+# formula 
+for i in range(5,22,1):
+  ws.Range(ws.Cells(i, 5), ws.Cells(i, 5)).Formula = "=IF(C" + str(i) + "=0,"",IFERROR((C" + str(i) + "/D" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 8), ws.Cells(i, 8)).Formula = "=IFERROR(F" + str(i) + "/G" + str(i) + "-1,0)"
+  ws.Range(ws.Cells(i, 11), ws.Cells(i, 11)).Formula = "=IFERROR(I" + str(i) + "/J" + str(i) + "-1,0)"
+  ws.Range(ws.Cells(i, 14), ws.Cells(i, 14)).Formula = "=IF(L" + str(i) + "=0,"",IFERROR((L" + str(i) + "/M" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 17), ws.Cells(i, 17)).Formula = "=IF(O" + str(i) + "=0,"",IFERROR((O" + str(i) + "/P" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 20), ws.Cells(i, 20)).Formula = "=IF(R" + str(i) + "=0,"",IFERROR((R" + str(i) + "/S" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 23), ws.Cells(i, 23)).Formula = "=IF(U" + str(i) + "=0,"",IFERROR((U" + str(i) + "/V" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 26), ws.Cells(i, 26)).Formula = "=IF(X" + str(i) + "=0,"",IFERROR((X" + str(i) + "/Y" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 29), ws.Cells(i, 29)).Formula = "=IF(AA" + str(i) + "=0,"",IFERROR((AA" + str(i) + "/AB" + str(i) + "),""))"
+
+for i in range(26,43,1):
+  ws.Range(ws.Cells(i, 5), ws.Cells(i, 5)).Formula = "=IF(C" + str(i) + "=0,"",IFERROR((C" + str(i) + "/D" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 8), ws.Cells(i, 8)).Formula = "=IF(F" + str(i) + "=0,"",IFERROR((F" + str(i) + "/G" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 11), ws.Cells(i, 11)).Formula = "=IF(I" + str(i) + "=0,"",IFERROR((I" + str(i) + "/J" + str(i) + "),""))"
+  ws.Range(ws.Cells(i, 14), ws.Cells(i, 14)).Formula = "=IF(L" + str(i) + "=0,"",IFERROR((L" + str(i) + "/M" + str(i) + "),""))"
+  
+ws.Range(ws.Cells(5, 3), ws.Cells(5, 3)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 4), ws.Cells(5, 4)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 6), ws.Cells(5, 6)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 7), ws.Cells(5, 7)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 12), ws.Cells(5, 12)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 13), ws.Cells(5, 13)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 15), ws.Cells(5, 15)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 16), ws.Cells(5, 16)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 18), ws.Cells(5, 18)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 19), ws.Cells(5, 19)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 21), ws.Cells(5, 21)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 22), ws.Cells(5, 22)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 24), ws.Cells(5, 24)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 25), ws.Cells(5, 25)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 27), ws.Cells(5, 27)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(5, 28), ws.Cells(5, 28)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+
+ws.Range(ws.Cells(26, 3), ws.Cells(26, 3)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(26, 4), ws.Cells(26, 4)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(26, 6), ws.Cells(26, 6)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(26, 7), ws.Cells(26, 7)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(26, 9), ws.Cells(26, 9)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(26, 10), ws.Cells(26, 10)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(26, 12), ws.Cells(26, 12)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+ws.Range(ws.Cells(26, 13), ws.Cells(26, 13)).FormulaR1C1 = "=SUM(R[1]C:R[16]C)"
+
+
+ws.Range("C5:AC21").NumberFormat = "#,#0"
+ws.Range("E5:E21").NumberFormat = "0.0%"
+ws.Range("H5:H21").NumberFormat = "0.0%"
+ws.Range("K5:K21").NumberFormat = "0.0%"
+ws.Range("N5:N21").NumberFormat = "0.0%"
+ws.Range("Q5:Q21").NumberFormat = "0.0%"
+ws.Range("T5:T21").NumberFormat = "0.0%"
+ws.Range("W5:W21").NumberFormat = "0.0%"
+ws.Range("Z5:Z21").NumberFormat = "0.0%"
+ws.Range("AC5:AC21").NumberFormat = "0.0%"
+
+ws.Range("C26:N42").NumberFormat = "#,#0"
+ws.Range("E26:E42").NumberFormat = "0.0%"
+ws.Range("H26:H42").NumberFormat = "0.0%"
+ws.Range("K26:K42").NumberFormat = "0.0%"
+ws.Range("N26:N42").NumberFormat = "0.0%"
+
+
+# ============= TOP 30 SKU
+q = "CALL SP_RPT_DailySalesMTD(12, '" + asofdate + "', null)"
+dfw = pd.read_sql(q, cn)
+dfw = dfw.fillna('')
+    
+cmax = len(dfw.columns)
+rmax = len(dfw.index) + 4
+
+# Paste recordset
+st_row = 48
+st_col = 2
+ws.Range(ws.Cells(st_row, st_col),# Cell to start the "paste"
+          ws.Cells(st_row + len(dfw.index) - 1,
+                  st_col + len(dfw.columns) - 1) # No -1 for the index
+          ).Value = dfw.to_records(index=False)
+
+
+ws.Range(ws.Cells(st_row, st_col + 4), ws.Cells(st_row + rmax - 5, st_col + 4)).Cut(ws.Range(ws.Cells(st_row, st_col + 1), ws.Cells(st_row + rmax - 5, st_col + 1)))
+ws.Range(ws.Cells(st_row, st_col + 6), ws.Cells(st_row + rmax - 5, st_col + 6)).Cut(ws.Range(ws.Cells(st_row, st_col + 2), ws.Cells(st_row + rmax - 5, st_col + 2)))
+
+ws.Range("B45").Value = "TOP 30 SKUs"
+ws.Range("B45:B46").MergeCells = True
+ws.Range("C45").Value = "MTD MARCH"
+ws.Range("C45:D46").MergeCells = True
+
+ws.Range("B47").Value = "ITEM NAME"
+ws.Range("C47").Value = "SALES"
+ws.Range("D47").Value = "TRANSACTION"
+
+ws.Range("B45:D47").VerticalAlignment = c.xlCenter
+ws.Range("B45:D47").HorizontalAlignment = c.xlCenter
+ws.Range("B45:D47").Font.Name = "Calibri"
+ws.Range("B45:D47").Font.FontStyle = "Bold"
+ws.Range("B45:D47").Font.Size = 11
+
+ws.Range("B48:B77").Font.FontStyle = "Bold"
+ws.Range("B48:D77").Font.Size = 10
+
+ws.Range("B45:D47").Borders(c.xlInsideHorizontal).LineStyle = c.xlContinuous
+ws.Range("B45:D47").Borders(c.xlInsideHorizontal).Weight = c.xlThin
+ws.Range("B45:D47").Borders(c.xlInsideHorizontal).Color = 0
+ws.Range("B45:D47").Borders(c.xlInsideVertical).LineStyle = c.xlContinuous
+ws.Range("B45:D47").Borders(c.xlInsideVertical).Weight = c.xlThin
+ws.Range("B45:D47").Borders(c.xlInsideVertical).Color = 0
+ws.Range("B45:D47").Borders(c.xlEdgeBottom).LineStyle = c.xlContinuous
+ws.Range("B45:D47").Borders(c.xlEdgeBottom).Weight = c.xlMedium
+ws.Range("B45:D47").Borders(c.xlEdgeBottom).Color = 0
+
+ws.Range("B48:D77").Borders(c.xlInsideHorizontal).LineStyle = c.xlContinuous
+ws.Range("B48:D77").Borders(c.xlInsideHorizontal).Weight = c.xlHairline
+ws.Range("B48:D77").Borders(c.xlInsideHorizontal).Color = 0
+ws.Range("B48:D77").Borders(c.xlInsideVertical).LineStyle = c.xlContinuous
+ws.Range("B48:D77").Borders(c.xlInsideVertical).Weight = c.xlThin
+ws.Range("B48:D77").Borders(c.xlInsideVertical).Color = 0
+
+ws.Range("B45:D77").Borders(c.xlEdgeTop).LineStyle = c.xlContinuous
+ws.Range("B45:D77").Borders(c.xlEdgeTop).Weight = c.xlMedium
+ws.Range("B45:D77").Borders(c.xlEdgeTop).Color = 0
+ws.Range("B45:D77").Borders(c.xlEdgeBottom).LineStyle = c.xlContinuous
+ws.Range("B45:D77").Borders(c.xlEdgeBottom).Weight = c.xlMedium
+ws.Range("B45:D77").Borders(c.xlEdgeBottom).Color = 0
+ws.Range("B45:D77").Borders(c.xlEdgeLeft).LineStyle = c.xlContinuous
+ws.Range("B45:D77").Borders(c.xlEdgeLeft).Weight = c.xlMedium
+ws.Range("B45:D77").Borders(c.xlEdgeLeft).Color = 0
+ws.Range("B45:D77").Borders(c.xlEdgeRight).LineStyle = c.xlContinuous
+ws.Range("B45:D77").Borders(c.xlEdgeRight).Weight = c.xlMedium
+ws.Range("B45:D77").Borders(c.xlEdgeRight).Color = 0
+
+ws.Range("C48:D77").NumberFormat = "#,#0"
+
+
+# CEK KES BY PERSON SUMMARY
+q = "CALL SP_RPT_DailySalesMTD(15, '" + asofdate + "', null)"
+dfw = pd.read_sql(q, cn)
+dfw = dfw.fillna('')
+    
+cmax = len(dfw.columns)
+rmax = len(dfw.index) + 4
+
+# Paste recordset
+st_row = 81
+st_col = 2
+ws.Range(ws.Cells(st_row, st_col),# Cell to start the "paste"
+          ws.Cells(st_row + len(dfw.index) - 1,
+                  st_col + len(dfw.columns) - 1) # No -1 for the index
+          ).Value = dfw.to_records(index=False)
+
+
+ws.Range("B79").Value = "CEK-KES BY PERSON - MTD MARCH"
+ws.Range("B80").Value = "STORE"
+ws.Range("C80").Value = "SALES PERSON"
+ws.Range("D80").Value = "SALES"
+ws.Range("E80").Value = "TRX"
+
+ws.Range("B79:E80").Font.Name = "Calibri"
+ws.Range("B79:E80").Font.FontStyle = "Bold"
+ws.Range("B80:E80").VerticalAlignment = c.xlCenter
+ws.Range("B80:E80").HorizontalAlignment = c.xlCenter
+
+
+ws.Range(ws.Cells(st_row - 2, st_col), ws.Cells(st_row + rmax - 4, st_col + cmax - 1)).Font.Size = 11
+ws.Range(ws.Cells(st_row, st_col), ws.Cells(st_row + rmax - 4, st_col)).VerticalAlignment = c.xlCenter
+ws.Range(ws.Cells(st_row, st_col), ws.Cells(st_row + rmax - 4, st_col)).HorizontalAlignment = c.xlCenter
+
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlInsideHorizontal).LineStyle = c.xlContinuous
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlInsideHorizontal).Weight = c.xlThin
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlInsideHorizontal).Color = 0
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlInsideVertical).LineStyle = c.xlContinuous
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlInsideVertical).Weight = c.xlThin
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlInsideVertical).Color = 0
+
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeTop).LineStyle = c.xlContinuous
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeTop).Weight = c.xlMedium
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeTop).Color = 0
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeBottom).LineStyle = c.xlContinuous
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeBottom).Weight = c.xlMedium
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeBottom).Color = 0
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeLeft).LineStyle = c.xlContinuous
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeLeft).Weight = c.xlMedium
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeLeft).Color = 0
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeRight).LineStyle = c.xlContinuous
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeRight).Weight = c.xlMedium
+ws.Range(ws.Cells(st_row - 1, st_col), ws.Cells(st_row + rmax - 5, st_col + cmax - 1)).Borders(c.xlEdgeRight).Color = 0
+
+ws.Range(ws.Cells(st_row, st_col + 2), ws.Cells(st_row + rmax - 5, st_col + cmax + 1)).NumberFormat = "#,#0"
+
+# merge cells 
+val0 = ws.Range(ws.Cells(st_row, st_col), ws.Cells(st_row, st_col)).Value
+istart = st_row
+for i in range(st_row + 1, st_row + rmax - 3, 1):
+  valtest = ws.Range(ws.Cells(i, st_col), ws.Cells(i, st_col)).Value
+  if valtest != val0 :
+    ws.Range(ws.Cells(istart, st_col), ws.Cells(i-1, st_col)).MergeCells = True
+    istart = i
+  val0 = valtest
+print (rmax, valtest, istart)
+#================= finalize workbook
 
 for sheet in wb.Sheets:
   xl.DisplayAlerts = False
